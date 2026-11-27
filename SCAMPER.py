@@ -46,72 +46,75 @@ st.markdown(
     background-color: #f8f9fa;
 }
 .block-container {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+    padding-top: 4.5rem;
+    padding-bottom: 1rem;
     max-width: 1380px;
+}
+[data-testid="stTabs"] {
+    padding-top: 0.5rem;
 }
 .titulo-scamper {
     text-align: center;
     font-family: 'Segoe UI', sans-serif;
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 800;
     color: #212529;
     letter-spacing: 3px;
-    margin-bottom: 2px;
+    margin-bottom: 0px;
+    line-height: 1.1;
 }
 .subtitulo-estado {
     text-align: center;
     font-family: 'Segoe UI', sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     color: #6c757d;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 .barra-vidas {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin: 6px 0 16px 0;
+    gap: 6px;
+    margin: 4px 0 10px 0;
 }
 .chip-vida {
     background-color: #ffffff;
     border: 1px solid #dee2e6;
     border-radius: 20px;
-    padding: 4px 11px;
+    padding: 3px 10px;
     font-family: 'Segoe UI', sans-serif;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 .panel-dimensiones {
     background-color: #ffffff;
     border: 1px solid #dee2e6;
     border-radius: 12px;
-    padding: 16px 14px;
-    min-height: 490px;
+    padding: 14px 12px;
 }
 .item-dimension {
     background-color: #f8f9fa;
     border-left: 4px solid #C44B56;
     border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 10px;
+    padding: 9px 11px;
+    margin-bottom: 8px;
     font-family: 'Segoe UI', sans-serif;
 }
 .titulo-dimension {
     font-size: 13px;
     font-weight: 700;
     color: #212529;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 }
 .detalle-dimension {
     font-size: 12px;
     color: #6c757d;
-    line-height: 1.35;
+    line-height: 1.3;
 }
 .titulo-historial {
     text-align: center;
@@ -119,14 +122,14 @@ st.markdown(
     font-size: 14px;
     font-weight: 700;
     color: #343a40;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     letter-spacing: 0.5px;
 }
 .item-historial {
     background-color: #f1f3f5;
     color: #212529;
-    padding: 8px 10px;
-    margin-bottom: 7px;
+    padding: 7px 10px;
+    margin-bottom: 6px;
     border-radius: 8px;
     font-family: 'Segoe UI', sans-serif;
     font-size: 12px;
@@ -157,8 +160,8 @@ div.stButton > button {
     border-radius: 10px;
     font-family: 'Segoe UI', sans-serif;
     font-weight: 700;
-    font-size: 15px;
-    padding: 12px 18px;
+    font-size: 14.5px;
+    padding: 10px 16px;
     border: none;
 }
 div.stButton > button[kind="primary"] {
@@ -376,7 +379,7 @@ def crear_imagen_qr(url: str) -> bytes:
     qr = qrcode.QRCode(
         version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_M,
-        box_size=8,
+        box_size=7,
         border=2,
     )
     qr.add_data(url)
@@ -486,23 +489,23 @@ def reproducir_campana():
 # ==============================================================================
 
 def generar_svg_ruleta(opciones, angulo_actual):
-    size = 420
+    size = 350
     cx = size / 2
     cy = size / 2
-    r = 180
+    r = 148
     num = len(opciones)
 
     if num == 0:
         return (
             f'<div style="display:flex;justify-content:center;'
-            f'align-items:center;margin:6px 0;">'
+            f'align-items:center;margin:4px 0;">'
             f'<svg width="{size}" height="{size}" '
             f'viewBox="0 0 {size} {size}">'
             f'<circle cx="{cx}" cy="{cy}" r="{r}" '
             f'fill="#f8f9fa" stroke="#dee2e6" stroke-width="3"/>'
             f'<text x="{cx}" y="{cy}" fill="#495057" '
             f'font-family="Segoe UI, sans-serif" '
-            f'font-size="22" font-weight="bold" '
+            f'font-size="20" font-weight="bold" '
             f'text-anchor="middle" dominant-baseline="middle">'
             f'¡CICLO COMPLETADO!</text></svg></div>'
         )
@@ -549,7 +552,7 @@ def generar_svg_ruleta(opciones, angulo_actual):
         tx = cx + (r * 0.56) * math.cos(mid_rad)
         ty = cy + (r * 0.56) * math.sin(mid_rad)
 
-        font_size = 10 if len(opt["nombre"]) > 14 else 11.5
+        font_size = 9 if len(opt["nombre"]) > 14 else 10.5
         color_texto = (
             "#212529" if opt["color"] in ["#F5D687", "#B3CFC3"] else "#ffffff"
         )
@@ -567,14 +570,14 @@ def generar_svg_ruleta(opciones, angulo_actual):
     centro_y_flecha = (
         f'<circle cx="{cx}" cy="{cy}" r="{r * 0.16:.1f}" '
         f'fill="#ffffff" stroke="#c8c8c8" stroke-width="3"/>'
-        f'<polygon points="{cx},{cy - r - 15} '
-        f'{cx - 13},{cy - r + 4} '
-        f'{cx + 13},{cy - r + 4}" fill="#212529"/>'
+        f'<polygon points="{cx},{cy - r - 13} '
+        f'{cx - 11},{cy - r + 4} '
+        f'{cx + 11},{cy - r + 4}" fill="#212529"/>'
     )
 
     return (
         f'<div style="display:flex;justify-content:center;'
-        f'align-items:center;margin:2px 0 6px 0;">'
+        f'align-items:center;margin:0 0 4px 0;">'
         f'<svg width="{size}" height="{size}" '
         f'viewBox="0 0 {size} {size}">'
         f'{"".join(partes)}{centro_y_flecha}'
@@ -598,7 +601,7 @@ def generar_barra_vidas(todas_opciones):
         chips.append(
             f'<div class="chip-vida" style="opacity:{opacidad};">'
             f'<span style="color:{color_letra};'
-            f'font-size:15px;font-weight:900;">'
+            f'font-size:14px;font-weight:900;">'
             f'{opt["letra"]}</span>'
             f'<span style="color:{color_letra};'
             f'letter-spacing:1px;">{puntos}</span>'
@@ -625,7 +628,7 @@ def dialogo_reto():
     st.markdown(
         f'<div style="text-align:center;'
         f'font-family:Segoe UI,sans-serif;'
-        f'font-size:46px;font-weight:800;'
+        f'font-size:44px;font-weight:800;'
         f'color:{ganador["color"]};line-height:1.1;'
         f'text-shadow:1px 1px 2px rgba(0,0,0,0.08);">'
         f'{ganador["letra"]} - {ganador["nombre"]}</div>'
@@ -670,7 +673,7 @@ def dialogo_reto():
     st.markdown(
         f'<div style="text-align:center;'
         f'font-family:Segoe UI,sans-serif;'
-        f'font-size:38px;font-weight:800;'
+        f'font-size:36px;font-weight:800;'
         f'color:{color_reloj};background:#f8f9fa;'
         f'border-radius:10px;padding:10px;'
         f'margin:12px 0;">{texto_reloj}</div>',
@@ -903,7 +906,7 @@ with tab_ruleta:
 
         with st.container(border=True):
             st.markdown(
-                '<div class="titulo-historial" style="margin-bottom:8px;">📱 CÓDIGO QR</div>',
+                '<div class="titulo-historial" style="margin-bottom:6px;">📱 CÓDIGO QR</div>',
                 unsafe_allow_html=True,
             )
             st.image(
