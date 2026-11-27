@@ -8,6 +8,7 @@ import io
 import math
 import random
 import time
+import urllib.parse
 import urllib.request
 
 import qrcode
@@ -19,13 +20,11 @@ import streamlit.components.v1 as components
 # CONFIGURACIÓN DE ENLACES (APPS SCRIPT QR Y GOOGLE SHEETS)
 # ==============================================================================
 
-# 1. URL /exec de tu aplicación de Google Apps Script:
 URL_QR = (
     "https://script.google.com/macros/s/"
     "AKfycby4nMK6bqOTWUGv0hrxAW4njgaJ5vLWrzHRN1JMlUZad51hKTkzXAh2SvSgQJfDItwcpA/exec"
 )
 
-# 2. ID del Google Sheet "Mejoras para la comunicación-Scamper":
 SHEET_ID = "1rRngtD0iPbaGrwSXjmR7cfIoBjzwtBLxGgj8CH1PESk"
 SHEET_NAME = "Respuestas"
 
@@ -207,7 +206,7 @@ DIMENSIONES_SESION = [
 
 
 # ==============================================================================
-# 3. DATOS SCAMPER
+# 3. DATOS SCAMPER (49 PREGUNTAS: 7 POR CATEGORÍA)
 # ==============================================================================
 
 DATOS_SCAMPER = [
@@ -218,8 +217,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué podríamos cambiar en nuestra forma de comunicarnos para generar conversaciones más abiertas y cercanas entre compañeros?",
-            "¿Qué hábitos de comunicación deberíamos sustituir para evitar malentendidos entre las tres áreas?",
+            "¿Qué forma de comunicarnos podríamos cambiar por algo más ligero o cercano?",
+            "¿Qué mensaje o aviso rápido podría reemplazar a una reunión corta?",
+            "¿Qué hábito de comunicación podríamos cambiar para que sea más claro para todos?",
+            "¿Qué canal podríamos usar en su lugar para compartir novedades del día a día?",
+            "¿Qué forma de pedir algo podríamos cambiar para hacerlo más directo y sencillo?",
+            "¿Qué rutina de actualización podríamos sustituir por algo más práctico?",
+            "¿Qué palabra o frase podríamos cambiar para hacer las conversaciones más fluidas?",
         ],
     },
     {
@@ -229,8 +233,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué espacios podríamos crear o combinar para compartir no solamente temas de trabajo, sino también experiencias e intereses como compañeros?",
-            "¿Cómo podríamos integrar mejor los conocimientos y perspectivas de Innovación, Investigación y Voz del Cliente mediante una comunicación más fluida?",
+            "¿Qué momentos del día podríamos juntar para conversar más entre compañeros?",
+            "¿Qué espacios de trabajo podríamos unir para compartir avances de forma sencilla?",
+            "¿Qué temas de conversación podríamos combinar para conocernos mejor?",
+            "¿Qué ideas de distintos compañeros podríamos sumar para hacer algo más fácil?",
+            "¿Qué dinámicas cortas podríamos combinar para romper el hielo al empezar?",
+            "¿Qué canales podríamos conectar mejor para no buscar información en tantos lugares?",
+            "¿Qué intereses o gustos del equipo podríamos unir en una conversación casual?",
         ],
     },
     {
@@ -240,8 +249,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué buenas prácticas de comunicación podríamos adoptar para escucharnos y comprendernos mejor como equipo?",
-            "¿Cómo podríamos adaptar nuestra forma de compartir información para que las otras áreas comprendan mejor nuestro trabajo?",
+            "¿Cómo podríamos ajustar nuestra forma de contar las cosas para que sea más fácil de entender?",
+            "¿Qué detalle pequeño podríamos adaptar en cómo compartimos información?",
+            "¿Cómo podemos adaptar el ritmo de comunicación cuando andamos con más calma o más movimiento?",
+            "¿Qué forma de dar contexto podríamos adaptar para que todos arranquemos en la misma página?",
+            "¿Cómo podríamos adaptar nuestros mensajes para que sean más breves y claros?",
+            "¿Qué buena costumbre de comunicación podríamos adaptar a nuestra rutina actual?",
+            "¿Cómo podríamos adaptar la forma de compartir ideas para que sea más cómoda para todos?",
         ],
     },
     {
@@ -251,8 +265,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué podríamos cambiar en nuestras conversaciones y reuniones para que todos tengamos más oportunidades de participar y expresar nuestras ideas?",
-            "¿Cómo podríamos mejorar la manera en que nos comunicamos cuando necesitamos apoyo o colaboración de otros compañeros?",
+            "¿Qué detalle pequeño podríamos cambiar en nuestras reuniones para hacerlas más dinámicas?",
+            "¿Cómo podríamos ajustar la forma en que compartimos dudas para resolverlas rápido?",
+            "¿Qué podríamos cambiar en cómo nos ponemos de acuerdo para que quede más claro?",
+            "¿Cómo podríamos modificar el cierre de las conversaciones para recordar mejor los puntos clave?",
+            "¿Qué pequeño ajuste haría que participar en las charlas se sienta más natural?",
+            "¿Cómo podríamos cambiar la forma de compartir avances para que sea más visual o directa?",
+            "¿Qué detalle podríamos ajustar para que las conversaciones fluyan con menos vueltas?",
         ],
     },
     {
@@ -262,8 +281,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Cómo podríamos aprovechar los espacios que ya compartimos para conocernos mejor y fortalecer nuestra comunicación como compañeros?",
-            "¿Cómo podríamos aprovechar las fortalezas y conocimientos de cada compañero para apoyarnos mutuamente?",
+            "¿Cómo podríamos aprovechar las reuniones que ya tenemos para conversar un poco más entre todos?",
+            "¿De qué otra forma podríamos usar los espacios que ya compartimos para conectar como equipo?",
+            "¿Cómo podríamos aprovechar los talentos o ideas de cada persona en el día a día?",
+            "¿Qué otro uso sencillo le podemos dar a nuestros espacios de charla actuales?",
+            "¿Cómo podríamos aprovechar las pausas o momentos libres para conversar sin presión?",
+            "¿De qué otra manera podríamos usar las notas o resúmenes que ya hacemos?",
+            "¿Cómo podríamos aprovechar mejor la cercanía del equipo para tirar ideas rápidas?",
         ],
     },
     {
@@ -273,8 +297,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué barreras o hábitos de comunicación deberíamos dejar atrás para relacionarnos mejor como compañeros y sentirnos más conectados como equipo?",
-            "¿Qué situaciones hacen que a veces no compartamos nuestras ideas, inquietudes o necesidades con los demás?",
+            "¿Qué paso innecesario podríamos quitar para comunicarnos más simple?",
+            "¿Qué ruido o distracción podríamos dejar de lado al conversar?",
+            "¿Qué vuelta extra podríamos evitar al compartir algo sencillo?",
+            "¿Qué costumbre que ya no aporta podríamos dejar ir en nuestra comunicación?",
+            "¿Qué detalle podríamos quitar para que un mensaje o aviso sea más directo?",
+            "¿Qué barrera pequeña podríamos eliminar para hablar con más confianza?",
+            "¿Qué cosa que consume tiempo podríamos dejar fuera de las charlas cotidianas?",
         ],
     },
     {
@@ -284,8 +313,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Cómo podríamos reorganizar nuestras dinámicas de comunicación y trabajo para estar más conectados como equipo e involucrar a las tres áreas desde el inicio de los proyectos?",
-            "¿Cómo podríamos generar más oportunidades para conversar, compartir y colaborar entre compañeros, incluso cuando no estamos trabajando en un mismo proyecto?",
+            "¿En qué otro orden podríamos abordar los temas para que la conversación sea más clara?",
+            "¿Cómo podríamos ordenar la información para encontrar lo importante más rápido?",
+            "¿Qué momento del día funciona mejor para compartir ciertas novedades?",
+            "¿Cómo podríamos acomodar mejor el orden de participación cuando conversamos?",
+            "¿Qué tema convendría tocar primero para facilitar el resto de la conversación?",
+            "¿Cómo podríamos reorganizar el orden de las ideas antes de tomar una decisión sencilla?",
+            "¿En qué otro momento podríamos tener charlas ligeras para que encajen mejor con el día?",
         ],
     },
 ]
@@ -333,6 +367,9 @@ def inicializar_estado():
     if "url_qr" not in st.session_state:
         st.session_state.url_qr = URL_QR
 
+    if "refresco_nube" not in st.session_state:
+        st.session_state.refresco_nube = 0
+
 
 @st.cache_data
 def crear_imagen_qr(url: str) -> bytes:
@@ -350,14 +387,22 @@ def crear_imagen_qr(url: str) -> bytes:
     return buffer.getvalue()
 
 
-def leer_ideas_sheet():
+def leer_ideas_sheet(nonce: int = 0):
     url_csv = (
         f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq"
-        f"?tqx=out:csv&sheet={SHEET_NAME}"
+        f"?tqx=out:csv&sheet={urllib.parse.quote(SHEET_NAME)}&cachebust={nonce}"
     )
     try:
-        with urllib.request.urlopen(url_csv, timeout=8) as resp:
-            contenido = resp.read().decode("utf-8")
+        req = urllib.request.Request(
+            url_csv,
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            contenido = resp.read().decode("utf-8", errors="replace")
+
+        if contenido.lstrip().startswith("<!DOCTYPE html") or "<html" in contenido[:200].lower():
+            return [], "No se pudo leer el CSV (revisa que el Google Sheet esté compartido como lector)."
+
         lector = csv.reader(io.StringIO(contenido))
         filas = list(lector)
         if len(filas) <= 1:
@@ -714,7 +759,6 @@ tab_ruleta, tab_nube = st.tabs(["🎯 Ruleta SCAMPER", "☁️ Nubecita de ideas
 with tab_ruleta:
     col_izq, col_centro, col_der = st.columns([1.25, 3.0, 1.35], gap="large")
 
-    # COLUMNA IZQUIERDA: DIMENSIONES
     with col_izq:
         dims_html = ""
         for dim in DIMENSIONES_SESION:
@@ -733,7 +777,6 @@ with tab_ruleta:
             unsafe_allow_html=True,
         )
 
-    # COLUMNA CENTRAL: RULETA
     with col_centro:
         st.markdown(
             '<div class="titulo-scamper">SCAMPER</div>',
@@ -840,7 +883,6 @@ with tab_ruleta:
 
             st.rerun()
 
-    # COLUMNA DERECHA: HISTORIAL Y CÓDIGO QR
     with col_der:
         with st.container(border=True):
             st.markdown(
@@ -883,15 +925,14 @@ with tab_nube:
             "Las ideas idénticas se agrupan automáticamente y crecen según cuántas veces se repiten."
         )
     with c_btn:
-        st.button("🔄 Actualizar ideas", use_container_width=True)
+        if st.button("🔄 Actualizar ideas", use_container_width=True):
+            st.session_state.refresco_nube += 1
+            st.rerun()
 
-    ideas_lista, error_lectura = leer_ideas_sheet()
+    ideas_lista, error_lectura = leer_ideas_sheet(st.session_state.refresco_nube)
 
     if error_lectura:
-        st.info(
-            "Para ver la nube aquí, asegúrate de que el Google Sheet esté compartido como "
-            "'Cualquier persona con el enlace puede leer' (o usa el botón 'Ver nubecita de ideas' dentro de la app del QR)."
-        )
+        st.warning(error_lectura)
     elif not ideas_lista:
         st.info("Aún no hay ideas registradas en la hoja 'Respuestas'.")
     else:
