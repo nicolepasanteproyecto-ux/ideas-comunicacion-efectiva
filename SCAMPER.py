@@ -3,11 +3,25 @@
 Ruleta SCAMPER - Comunicación de Equipo
 """
 
-import streamlit as st
-import streamlit.components.v1 as components
+import io
+import math
 import random
 import time
-import math
+
+import qrcode
+from PIL import Image
+import streamlit as st
+import streamlit.components.v1 as components
+
+# ==============================================================================
+# ENLACE PARA EL CÓDIGO QR
+# ==============================================================================
+
+URL_QR = (
+    "https://script.google.com/macros/s/"
+    "AKfycbwWFXqIzVCOSLVeShaBEgkO6vcapWbWgwFET94kvt1R0-SdZxh_DI4rtbLtlWiJnhmS5Q/exec"
+)
+
 
 # ==============================================================================
 # 1. CONFIGURACIÓN DE PÁGINA Y ESTILOS
@@ -16,10 +30,11 @@ import math
 st.set_page_config(
     page_title="Ruleta SCAMPER - Comunicación de Equipo",
     page_icon="🎯",
-    layout="wide"
+    layout="wide",
 )
 
-st.markdown("""
+st.markdown(
+    """
 <style>
 .stApp {
     background-color: #f8f9fa;
@@ -97,7 +112,7 @@ st.markdown("""
     border: 1px solid #dee2e6;
     border-radius: 12px;
     padding: 15px 14px;
-    height: 250px;
+    height: 220px;
     overflow-y: auto;
     margin-bottom: 12px;
 }
@@ -151,7 +166,9 @@ div.stButton > button[kind="secondary"]:hover {
     background-color: #dee2e6;
 }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 
 # ==============================================================================
@@ -161,19 +178,19 @@ div.stButton > button[kind="secondary"]:hover {
 DIMENSIONES_SESION = [
     {
         "titulo": "1. Compañerismo",
-        "detalle": "Cercanía, confianza y conocernos más allá del día a día"
+        "detalle": "Cercanía, confianza y conocernos más allá del día a día",
     },
     {
         "titulo": "2. Colaboración",
-        "detalle": "Apoyarnos mutuamente y sumar fortalezas entre áreas"
+        "detalle": "Apoyarnos mutuamente y sumar fortalezas entre áreas",
     },
     {
         "titulo": "3. Trabajo en equipo",
-        "detalle": "Sentirnos un solo grupo y saber en qué anda cada quien"
+        "detalle": "Sentirnos un solo grupo y saber en qué anda cada quien",
     },
     {
         "titulo": "4. Comunicación",
-        "detalle": "Conversaciones abiertas, claras y a tiempo entre todos"
+        "detalle": "Conversaciones abiertas, claras y a tiempo entre todos",
     },
 ]
 
@@ -183,7 +200,6 @@ DIMENSIONES_SESION = [
 # ==============================================================================
 
 DATOS_SCAMPER = [
-
     {
         "letra": "S",
         "nombre": "SUSTITUIR",
@@ -192,10 +208,9 @@ DATOS_SCAMPER = [
         "max_salidas": 3,
         "preguntas": [
             "¿Qué podríamos cambiar en nuestra forma de comunicarnos para generar conversaciones más abiertas y cercanas entre compañeros?",
-            "¿Qué hábitos de comunicación deberíamos sustituir para evitar malentendidos entre las tres áreas?"
-        ]
+            "¿Qué hábitos de comunicación deberíamos sustituir para evitar malentendidos entre las tres áreas?",
+        ],
     },
-
     {
         "letra": "C",
         "nombre": "COMBINAR",
@@ -204,10 +219,9 @@ DATOS_SCAMPER = [
         "max_salidas": 3,
         "preguntas": [
             "¿Qué espacios podríamos crear o combinar para compartir no solamente temas de trabajo, sino también experiencias e intereses como compañeros?",
-            "¿Cómo podríamos integrar mejor los conocimientos y perspectivas de Innovación, Investigación y Voz del Cliente mediante una comunicación más fluida?"
-        ]
+            "¿Cómo podríamos integrar mejor los conocimientos y perspectivas de Innovación, Investigación y Voz del Cliente mediante una comunicación más fluida?",
+        ],
     },
-
     {
         "letra": "A",
         "nombre": "ADAPTAR",
@@ -216,10 +230,9 @@ DATOS_SCAMPER = [
         "max_salidas": 3,
         "preguntas": [
             "¿Qué buenas prácticas de comunicación podríamos adoptar para escucharnos y comprendernos mejor como equipo?",
-            "¿Cómo podríamos adaptar nuestra forma de compartir información para que las otras áreas comprendan mejor nuestro trabajo?"
-        ]
+            "¿Cómo podríamos adaptar nuestra forma de compartir información para que las otras áreas comprendan mejor nuestro trabajo?",
+        ],
     },
-
     {
         "letra": "M",
         "nombre": "MODIFICAR",
@@ -228,10 +241,9 @@ DATOS_SCAMPER = [
         "max_salidas": 3,
         "preguntas": [
             "¿Qué podríamos cambiar en nuestras conversaciones y reuniones para que todos tengamos más oportunidades de participar y expresar nuestras ideas?",
-            "¿Cómo podríamos mejorar la manera en que nos comunicamos cuando necesitamos apoyo o colaboración de otros compañeros?"
-        ]
+            "¿Cómo podríamos mejorar la manera en que nos comunicamos cuando necesitamos apoyo o colaboración de otros compañeros?",
+        ],
     },
-
     {
         "letra": "P",
         "nombre": "PONER EN OTROS USOS",
@@ -240,10 +252,9 @@ DATOS_SCAMPER = [
         "max_salidas": 3,
         "preguntas": [
             "¿Cómo podríamos aprovechar los espacios que ya compartimos para conocernos mejor y fortalecer nuestra comunicación como compañeros?",
-            "¿Cómo podríamos aprovechar las fortalezas y conocimientos de cada compañero para apoyarnos mutuamente?"
-        ]
+            "¿Cómo podríamos aprovechar las fortalezas y conocimientos de cada compañero para apoyarnos mutuamente?",
+        ],
     },
-
     {
         "letra": "E",
         "nombre": "ELIMINAR",
@@ -252,10 +263,9 @@ DATOS_SCAMPER = [
         "max_salidas": 3,
         "preguntas": [
             "¿Qué barreras o hábitos de comunicación deberíamos dejar atrás para relacionarnos mejor como compañeros y sentirnos más conectados como equipo?",
-            "¿Qué situaciones hacen que a veces no compartamos nuestras ideas, inquietudes o necesidades con los demás?"
-        ]
+            "¿Qué situaciones hacen que a veces no compartamos nuestras ideas, inquietudes o necesidades con los demás?",
+        ],
     },
-
     {
         "letra": "R",
         "nombre": "REORDENAR",
@@ -264,23 +274,20 @@ DATOS_SCAMPER = [
         "max_salidas": 3,
         "preguntas": [
             "¿Cómo podríamos reorganizar nuestras dinámicas de comunicación y trabajo para estar más conectados como equipo e involucrar a las tres áreas desde el inicio de los proyectos?",
-            "¿Cómo podríamos generar más oportunidades para conversar, compartir y colaborar entre compañeros, incluso cuando no estamos trabajando en un mismo proyecto?"
-        ]
-    }
-
+            "¿Cómo podríamos generar más oportunidades para conversar, compartir y colaborar entre compañeros, incluso cuando no estamos trabajando en un mismo proyecto?",
+        ],
+    },
 ]
 
 
 # ==============================================================================
-# 4. INICIALIZAR ESTADOS
+# 4. INICIALIZAR ESTADOS Y GENERAR QR
 # ==============================================================================
 
 def inicializar_estado():
-
     if "opciones" not in st.session_state:
         st.session_state.opciones = [
-            {**item, "salidas_actuales": 0}
-            for item in DATOS_SCAMPER
+            {**item, "salidas_actuales": 0} for item in DATOS_SCAMPER
         ]
 
     if "historial" not in st.session_state:
@@ -290,9 +297,7 @@ def inicializar_estado():
         st.session_state.angulo_actual = 0
 
     if "estado_texto" not in st.session_state:
-        st.session_state.estado_texto = (
-            "Opciones activas: 7 (máx. 3 salidas c/u)"
-        )
+        st.session_state.estado_texto = "Opciones activas: 7 (máx. 3 salidas c/u)"
 
     if "mostrar_dialogo" not in st.session_state:
         st.session_state.mostrar_dialogo = False
@@ -313,7 +318,23 @@ def inicializar_estado():
         st.session_state.sonar_campana = False
 
     if "url_qr" not in st.session_state:
-        st.session_state.url_qr = ""
+        st.session_state.url_qr = URL_QR
+
+
+@st.cache_data
+def crear_imagen_qr(url: str) -> bytes:
+    qr = qrcode.QRCode(
+        version=None,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=8,
+        border=2,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    img: Image.Image = qr.make_image(fill_color="#212529", back_color="white").convert("RGB")
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    return buffer.getvalue()
 
 
 inicializar_estado()
@@ -324,7 +345,6 @@ inicializar_estado()
 # ==============================================================================
 
 def reproducir_campana():
-
     components.html(
         """
         <script>
@@ -362,7 +382,7 @@ def reproducir_campana():
         </script>
         """,
         height=0,
-        width=0
+        width=0,
     )
 
 
@@ -371,7 +391,6 @@ def reproducir_campana():
 # ==============================================================================
 
 def generar_svg_ruleta(opciones, angulo_actual):
-
     size = 420
     cx = size / 2
     cy = size / 2
@@ -379,7 +398,6 @@ def generar_svg_ruleta(opciones, angulo_actual):
     num = len(opciones)
 
     if num == 0:
-
         return (
             f'<div style="display:flex;justify-content:center;'
             f'align-items:center;margin:6px 0;">'
@@ -398,7 +416,6 @@ def generar_svg_ruleta(opciones, angulo_actual):
     partes = []
 
     for i, opt in enumerate(opciones):
-
         start_deg = (angulo_actual + i * paso) % 360
         end_deg = start_deg + paso
 
@@ -414,21 +431,17 @@ def generar_svg_ruleta(opciones, angulo_actual):
         large_arc = 1 if paso > 180 else 0
 
         if num == 1:
-
             partes.append(
                 f'<circle cx="{cx}" cy="{cy}" r="{r}" '
                 f'fill="{opt["color"]}" stroke="white" '
                 f'stroke-width="3"/>'
             )
-
         else:
-
             d = (
                 f"M {cx},{cy} L {x1:.2f},{y1:.2f} "
                 f"A {r},{r} 0 {large_arc},1 "
                 f"{x2:.2f},{y2:.2f} Z"
             )
-
             partes.append(
                 f'<path d="{d}" fill="{opt["color"]}" '
                 f'stroke="white" stroke-width="3"/>'
@@ -442,11 +455,8 @@ def generar_svg_ruleta(opciones, angulo_actual):
         ty = cy + (r * 0.56) * math.sin(mid_rad)
 
         font_size = 10 if len(opt["nombre"]) > 14 else 11.5
-
         color_texto = (
-            "#212529"
-            if opt["color"] in ["#F5D687", "#B3CFC3"]
-            else "#ffffff"
+            "#212529" if opt["color"] in ["#F5D687", "#B3CFC3"] else "#ffffff"
         )
 
         partes.append(
@@ -462,7 +472,6 @@ def generar_svg_ruleta(opciones, angulo_actual):
     centro_y_flecha = (
         f'<circle cx="{cx}" cy="{cy}" r="{r * 0.16:.1f}" '
         f'fill="#ffffff" stroke="#c8c8c8" stroke-width="3"/>'
-
         f'<polygon points="{cx},{cy - r - 15} '
         f'{cx - 13},{cy - r + 4} '
         f'{cx + 13},{cy - r + 4}" fill="#212529"/>'
@@ -474,7 +483,7 @@ def generar_svg_ruleta(opciones, angulo_actual):
         f'<svg width="{size}" height="{size}" '
         f'viewBox="0 0 {size} {size}">'
         f'{"".join(partes)}{centro_y_flecha}'
-        f'</svg></div>'
+        f"</svg></div>"
     )
 
 
@@ -483,25 +492,13 @@ def generar_svg_ruleta(opciones, angulo_actual):
 # ==============================================================================
 
 def generar_barra_vidas(todas_opciones):
-
     chips = []
 
     for opt in todas_opciones:
-
         restantes = opt["max_salidas"] - opt["salidas_actuales"]
-
-        puntos = (
-            "● " * restantes +
-            "○ " * opt["salidas_actuales"]
-        ).strip()
-
+        puntos = ("● " * restantes + "○ " * opt["salidas_actuales"]).strip()
         opacidad = "1" if restantes > 0 else "0.45"
-
-        color_letra = (
-            opt["color"]
-            if restantes > 0
-            else "#6c757d"
-        )
+        color_letra = opt["color"] if restantes > 0 else "#6c757d"
 
         chips.append(
             f'<div class="chip-vida" style="opacity:{opacidad};">'
@@ -510,7 +507,7 @@ def generar_barra_vidas(todas_opciones):
             f'{opt["letra"]}</span>'
             f'<span style="color:{color_letra};'
             f'letter-spacing:1px;">{puntos}</span>'
-            f'</div>'
+            f"</div>"
         )
 
     return f'<div class="barra-vidas">{"".join(chips)}</div>'
@@ -522,14 +519,11 @@ def generar_barra_vidas(todas_opciones):
 
 @st.dialog("Reto SCAMPER", width="small")
 def dialogo_reto():
-
     ganador = st.session_state.ganador_actual
-
     if not ganador:
         return
 
     if st.session_state.sonar_campana:
-
         reproducir_campana()
         st.session_state.sonar_campana = False
 
@@ -540,15 +534,13 @@ def dialogo_reto():
         f'color:{ganador["color"]};line-height:1.1;'
         f'text-shadow:1px 1px 2px rgba(0,0,0,0.08);">'
         f'{ganador["letra"]} - {ganador["nombre"]}</div>'
-
         f'<div style="text-align:center;'
         f'font-family:Segoe UI,sans-serif;'
         f'font-size:13px;color:#6c757d;'
         f'margin-bottom:12px;">'
         f'Salida #{ganador["salidas_actuales"]} '
         f'de {ganador["max_salidas"]}</div>',
-
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     st.markdown(
@@ -560,42 +552,24 @@ def dialogo_reto():
         f'font-size:15px;font-weight:600;'
         f'color:#212529;text-align:center;">'
         f'💡 "{st.session_state.pregunta_actual}"'
-        f'</div>',
-
-        unsafe_allow_html=True
+        f"</div>",
+        unsafe_allow_html=True,
     )
 
-    if st.button(
-        "🔄 Cambiar pregunta",
-        use_container_width=True
-    ):
-
+    if st.button("🔄 Cambiar pregunta", use_container_width=True):
         otras = [
-            p for p in ganador["preguntas"]
-            if p != st.session_state.pregunta_actual
+            p for p in ganador["preguntas"] if p != st.session_state.pregunta_actual
         ]
-
         st.session_state.pregunta_actual = (
-            random.choice(otras)
-            if otras
-            else random.choice(ganador["preguntas"])
+            random.choice(otras) if otras else random.choice(ganador["preguntas"])
         )
-
         st.rerun()
 
     mins = st.session_state.tiempo_restante // 60
     segs = st.session_state.tiempo_restante % 60
-
-    color_reloj = (
-        "#dc3545"
-        if st.session_state.tiempo_restante == 0
-        else "#C44B56"
-    )
-
+    color_reloj = "#dc3545" if st.session_state.tiempo_restante == 0 else "#C44B56"
     texto_reloj = (
-        "¡TIEMPO!"
-        if st.session_state.tiempo_restante == 0
-        else f"{mins:02d}:{segs:02d}"
+        "¡TIEMPO!" if st.session_state.tiempo_restante == 0 else f"{mins:02d}:{segs:02d}"
     )
 
     st.markdown(
@@ -605,55 +579,36 @@ def dialogo_reto():
         f'color:{color_reloj};background:#f8f9fa;'
         f'border-radius:10px;padding:10px;'
         f'margin:12px 0;">{texto_reloj}</div>',
-
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     c1, c2 = st.columns(2)
 
     with c1:
-
         if st.button(
             "▶ Iniciar",
             use_container_width=True,
-            disabled=(
-                st.session_state.tiempo_restante == 0
-            )
+            disabled=(st.session_state.tiempo_restante == 0),
         ):
-
             st.session_state.cronometro_activo = True
             st.rerun()
 
     with c2:
-
         if st.button(
             "⏸ Pausar",
             use_container_width=True,
-            disabled=(
-                st.session_state.tiempo_restante == 0
-            )
+            disabled=(st.session_state.tiempo_restante == 0),
         ):
-
             st.session_state.cronometro_activo = False
             st.rerun()
 
-    if st.button(
-        "⏹ Terminar",
-        type="primary",
-        use_container_width=True
-    ):
-
+    if st.button("⏹ Terminar", type="primary", use_container_width=True):
         st.session_state.cronometro_activo = False
         st.session_state.sonar_campana = False
 
-        transcurrido = (
-            ganador["tiempo_inicial"]
-            - st.session_state.tiempo_restante
-        )
-
+        transcurrido = ganador["tiempo_inicial"] - st.session_state.tiempo_restante
         m_t = transcurrido // 60
         s_t = transcurrido % 60
-
         duracion = f"{m_t:02d}:{s_t:02d}"
 
         st.session_state.historial.append(
@@ -662,18 +617,14 @@ def dialogo_reto():
         )
 
         activas = [
-            o for o in st.session_state.opciones
-            if o["salidas_actuales"] < o["max_salidas"]
+            o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
         ]
 
         if len(activas) == 0:
-
             st.session_state.estado_texto = (
                 "¡Todas las categorías completaron sus 3 salidas!"
             )
-
         else:
-
             st.session_state.estado_texto = (
                 f"Última: {ganador['nombre']} "
                 f"(#{ganador['salidas_actuales']}/3) "
@@ -681,20 +632,13 @@ def dialogo_reto():
             )
 
         st.session_state.mostrar_dialogo = False
-
         st.rerun()
 
-    if (
-        st.session_state.cronometro_activo
-        and st.session_state.tiempo_restante > 0
-    ):
-
+    if st.session_state.cronometro_activo and st.session_state.tiempo_restante > 0:
         time.sleep(1)
-
         st.session_state.tiempo_restante -= 1
 
         if st.session_state.tiempo_restante == 0:
-
             st.session_state.cronometro_activo = False
             st.session_state.sonar_campana = True
 
@@ -705,10 +649,7 @@ def dialogo_reto():
 # 9. INTERFAZ PRINCIPAL
 # ==============================================================================
 
-col_izq, col_centro, col_der = st.columns(
-    [1.25, 3.0, 1.25],
-    gap="large"
-)
+col_izq, col_centro, col_der = st.columns([1.25, 3.0, 1.35], gap="large")
 
 
 # ------------------------------------------------------------------------------
@@ -716,30 +657,21 @@ col_izq, col_centro, col_der = st.columns(
 # ------------------------------------------------------------------------------
 
 with col_izq:
-
     dims_html = ""
-
     for dim in DIMENSIONES_SESION:
-
         dims_html += (
             f'<div class="item-dimension">'
-            f'<div class="titulo-dimension">'
-            f'{dim["titulo"]}</div>'
-            f'<div class="detalle-dimension">'
-            f'{dim["detalle"]}</div>'
-            f'</div>'
+            f'<div class="titulo-dimension">{dim["titulo"]}</div>'
+            f'<div class="detalle-dimension">{dim["detalle"]}</div>'
+            f"</div>"
         )
 
-    html_dimensiones = (
-        '<div class="panel-dimensiones">'
-        '<div class="titulo-historial">🧭 4 DIMENSIONES</div>'
-        f'{dims_html}'
-        '</div>'
-    )
-
     st.markdown(
-        html_dimensiones,
-        unsafe_allow_html=True
+        f'<div class="panel-dimensiones">'
+        f'<div class="titulo-historial">🧭 4 DIMENSIONES</div>'
+        f"{dims_html}"
+        f"</div>",
+        unsafe_allow_html=True,
     )
 
 
@@ -748,165 +680,100 @@ with col_izq:
 # ------------------------------------------------------------------------------
 
 with col_centro:
-
     st.markdown(
         '<div class="titulo-scamper">SCAMPER</div>',
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     st.markdown(
-        f'<div class="subtitulo-estado">'
-        f'{st.session_state.estado_texto}</div>',
-        unsafe_allow_html=True
+        f'<div class="subtitulo-estado">{st.session_state.estado_texto}</div>',
+        unsafe_allow_html=True,
     )
 
     opciones_activas = [
-        o for o in st.session_state.opciones
-        if o["salidas_actuales"] < o["max_salidas"]
+        o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
     ]
 
     placeholder_ruleta = st.empty()
-
     placeholder_ruleta.markdown(
-        generar_svg_ruleta(
-            opciones_activas,
-            st.session_state.angulo_actual
-        ),
-        unsafe_allow_html=True
+        generar_svg_ruleta(opciones_activas, st.session_state.angulo_actual),
+        unsafe_allow_html=True,
     )
 
     st.markdown(
         generar_barra_vidas(st.session_state.opciones),
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     b1, b2 = st.columns(2, gap="medium")
 
     with b1:
-
         girar = st.button(
             "🎯 GIRAR RULETA",
             type="primary",
             use_container_width=True,
-            disabled=(len(opciones_activas) == 0)
+            disabled=(len(opciones_activas) == 0),
         )
 
     with b2:
-
         reiniciar = st.button(
             "🔄 Reiniciar",
             type="secondary",
-            use_container_width=True
+            use_container_width=True,
         )
-
-    # --------------------------------------------------------------------------
-    # REINICIAR LA DINÁMICA
-    # --------------------------------------------------------------------------
 
     if reiniciar:
-
         st.session_state.opciones = [
-            {**item, "salidas_actuales": 0}
-            for item in DATOS_SCAMPER
+            {**item, "salidas_actuales": 0} for item in DATOS_SCAMPER
         ]
-
         st.session_state.historial = []
         st.session_state.angulo_actual = 0
-
-        st.session_state.estado_texto = (
-            "Opciones activas: 7 (máx. 3 salidas c/u)"
-        )
-
+        st.session_state.estado_texto = "Opciones activas: 7 (máx. 3 salidas c/u)"
         st.session_state.mostrar_dialogo = False
         st.session_state.cronometro_activo = False
         st.session_state.sonar_campana = False
         st.session_state.ganador_actual = None
         st.session_state.pregunta_actual = ""
         st.session_state.tiempo_restante = 90
-
         st.rerun()
 
-    # --------------------------------------------------------------------------
-    # GIRAR RULETA
-    # --------------------------------------------------------------------------
-
     if girar and len(opciones_activas) > 0:
-
-        # Seleccionar la categoría ganadora.
-        indice_ganador = random.randrange(
-            len(opciones_activas)
-        )
-
+        indice_ganador = random.randrange(len(opciones_activas))
         paso = 360.0 / len(opciones_activas)
 
-        target_angle = (
-            360.0 - (
-                indice_ganador * paso + paso / 2.0
-            )
-        ) % 360.0
-
-        angulo_inicio = float(
-            st.session_state.angulo_actual
-        )
-
-        recorrido = (
-            target_angle - angulo_inicio
-        ) % 360.0
-
+        target_angle = (360.0 - (indice_ganador * paso + paso / 2.0)) % 360.0
+        angulo_inicio = float(st.session_state.angulo_actual)
+        recorrido = (target_angle - angulo_inicio) % 360.0
         recorrido += 360.0 * random.randint(5, 7)
 
         pasos_animacion = 85
 
-        # Animación con desaceleración.
         for paso_animacion in range(pasos_animacion):
-
-            progreso = (
-                paso_animacion + 1
-            ) / pasos_animacion
-
+            progreso = (paso_animacion + 1) / pasos_animacion
             suavizado = 1 - (1 - progreso) ** 3
-
-            angulo = (
-                angulo_inicio + recorrido * suavizado
-            ) % 360.0
-
+            angulo = (angulo_inicio + recorrido * suavizado) % 360.0
             st.session_state.angulo_actual = angulo
 
             placeholder_ruleta.markdown(
-                generar_svg_ruleta(
-                    opciones_activas,
-                    angulo
-                ),
-                unsafe_allow_html=True
+                generar_svg_ruleta(opciones_activas, angulo),
+                unsafe_allow_html=True,
             )
-
             time.sleep(0.015)
 
-        # Posición final.
         st.session_state.angulo_actual = target_angle
 
-        # Registrar ganador.
         ganador = opciones_activas[indice_ganador]
-
         ganador["salidas_actuales"] += 1
 
         st.session_state.ganador_actual = ganador
-
-        st.session_state.pregunta_actual = random.choice(
-            ganador["preguntas"]
-        )
-
-        st.session_state.tiempo_restante = (
-            ganador["tiempo_inicial"]
-        )
-
+        st.session_state.pregunta_actual = random.choice(ganador["preguntas"])
+        st.session_state.tiempo_restante = ganador["tiempo_inicial"]
         st.session_state.cronometro_activo = False
         st.session_state.sonar_campana = False
         st.session_state.mostrar_dialogo = True
 
         activas_restantes = [
-            o for o in st.session_state.opciones
-            if o["salidas_actuales"] < o["max_salidas"]
+            o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
         ]
 
         st.session_state.estado_texto = (
@@ -919,13 +786,49 @@ with col_centro:
         st.rerun()
 
 
+# ------------------------------------------------------------------------------
+# COLUMNA DERECHA: HISTORIAL Y CÓDIGO QR
+# ------------------------------------------------------------------------------
+
+with col_der:
+    if st.session_state.historial:
+        items_html = "".join(
+            f'<div class="item-historial">{item}</div>'
+            for item in reversed(st.session_state.historial)
+        )
+    else:
+        items_html = (
+            '<div style="text-align:center;color:#6c757d;'
+            'font-size:12px;margin-top:55px;">'
+            "Aún no hay salidas registradas</div>"
+        )
+
+    st.markdown(
+        f'<div class="panel-historial">'
+        f'<div class="titulo-historial">📋 HISTORIAL</div>'
+        f"{items_html}"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div class="panel-qr">'
+        '<div class="titulo-historial" style="margin-bottom:8px;">📱 CÓDIGO QR</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.image(
+        crear_imagen_qr(st.session_state.url_qr),
+        caption="Escanea para participar",
+        use_container_width=True,
+    )
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
 # ==============================================================================
 # 10. MOSTRAR VENTANA EMERGENTE
 # ==============================================================================
 
-if (
-    st.session_state.mostrar_dialogo
-    and st.session_state.ganador_actual
-):
-
+if st.session_state.mostrar_dialogo and st.session_state.ganador_actual:
     dialogo_reto()
