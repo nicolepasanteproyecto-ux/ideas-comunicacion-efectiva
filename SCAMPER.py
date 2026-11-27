@@ -3,10 +3,12 @@
 Ruleta SCAMPER - Comunicación de Equipo
 """
 
+import csv
 import io
 import math
 import random
 import time
+import urllib.request
 
 import qrcode
 from PIL import Image
@@ -14,13 +16,18 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # ==============================================================================
-# ENLACE PARA EL CÓDIGO QR
+# CONFIGURACIÓN DE ENLACES (APPS SCRIPT QR Y GOOGLE SHEETS)
 # ==============================================================================
 
+# 1. URL /exec de tu aplicación de Google Apps Script:
 URL_QR = (
     "https://script.google.com/macros/s/"
-    "AKfycbwWFXqIzVCOSLVeShaBEgkO6vcapWbWgwFET94kvt1R0-SdZxh_DI4rtbLtlWiJnhmS5Q/exec"
+    "AKfycby4nMK6bqOTWUGv0hrxAW4njgaJ5vLWrzHRN1JMlUZad51hKTkzXAh2SvSgQJfDItwcpA/exec"
 )
+
+# 2. ID del Google Sheet "Mejoras para la comunicación-Scamper":
+SHEET_ID = "1rRngtD0iPbaGrwSXjmR7cfIoBjzwtBLxGgj8CH1PESk"
+SHEET_NAME = "Respuestas"
 
 
 # ==============================================================================
@@ -107,29 +114,13 @@ st.markdown(
     color: #6c757d;
     line-height: 1.35;
 }
-.panel-historial {
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
-    padding: 15px 14px;
-    height: 220px;
-    overflow-y: auto;
-    margin-bottom: 12px;
-}
-.panel-qr {
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
-    padding: 14px 14px;
-    text-align: center;
-}
 .titulo-historial {
     text-align: center;
     font-family: 'Segoe UI', sans-serif;
     font-size: 14px;
     font-weight: 700;
     color: #343a40;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     letter-spacing: 0.5px;
 }
 .item-historial {
@@ -138,10 +129,30 @@ st.markdown(
     padding: 8px 10px;
     margin-bottom: 7px;
     border-radius: 8px;
-    border-left: 5px solid #C44B56;
     font-family: 'Segoe UI', sans-serif;
     font-size: 12px;
     font-weight: 700;
+}
+.nube-contenedor {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 16px;
+    padding: 28px 24px;
+    min-height: 320px;
+}
+.burbuja-nube {
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #212529;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 div.stButton > button {
     border-radius: 10px;
@@ -279,9 +290,11 @@ DATOS_SCAMPER = [
     },
 ]
 
+COLORES_LETRA = {item["letra"]: item["color"] for item in DATOS_SCAMPER}
+
 
 # ==============================================================================
-# 4. INICIALIZAR ESTADOS Y GENERAR QR
+# 4. INICIALIZAR ESTADOS, QR Y LECTURA DE IDEAS
 # ==============================================================================
 
 def inicializar_estado():
@@ -335,6 +348,43 @@ def crear_imagen_qr(url: str) -> bytes:
     buffer = io.BytesIO()
     img.save(buffer, format="PNG")
     return buffer.getvalue()
+
+
+def leer_ideas_sheet():
+    url_csv = (
+        f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq"
+        f"?tqx=out:csv&sheet={SHEET_NAME}"
+    )
+    try:
+        with urllib.request.urlopen(url_csv, timeout=8) as resp:
+            contenido = resp.read().decode("utf-8")
+        lector = csv.reader(io.StringIO(contenido))
+        filas = list(lector)
+        if len(filas) <= 1:
+            return [], None
+
+        agrupadas = {}
+        for fila in filas[1:]:
+            letra = fila[1].strip() if len(fila) > 1 else ""
+            idea = fila[3].strip() if len(fila) > 3 else ""
+            if not idea:
+                continue
+            clave = idea.lower()
+            if clave not in agrupadas:
+                agrupadas[clave] = {
+                    "idea": idea,
+                    "letra": letra[:1].upper() if letra else "",
+                    "cantidad": 1,
+                }
+            else:
+                agrupadas[clave]["cantidad"] += 1
+
+        lista = sorted(
+            agrupadas.values(), key=lambda x: x["cantidad"], reverse=True
+        )
+        return lista, None
+    except Exception as e:
+        return [], str(e)
 
 
 inicializar_estado()
@@ -612,8 +662,13 @@ def dialogo_reto():
         duracion = f"{m_t:02d}:{s_t:02d}"
 
         st.session_state.historial.append(
-            f"{ganador['letra']} - {ganador['nombre']} "
-            f"(#{ganador['salidas_actuales']}) [{duracion}]"
+            {
+                "texto": (
+                    f"{ganador['letra']} - {ganador['nombre']} "
+                    f"(#{ganador['salidas_actuales']}) [{duracion}]"
+                ),
+                "color": ganador["color"],
+            }
         )
 
         activas = [
@@ -646,184 +701,215 @@ def dialogo_reto():
 
 
 # ==============================================================================
-# 9. INTERFAZ PRINCIPAL
+# 9. PESTAÑAS PRINCIPALES (RULETA Y NUBE DE IDEAS)
 # ==============================================================================
 
-col_izq, col_centro, col_der = st.columns([1.25, 3.0, 1.35], gap="large")
+tab_ruleta, tab_nube = st.tabs(["🎯 Ruleta SCAMPER", "☁️ Nubecita de ideas"])
 
 
 # ------------------------------------------------------------------------------
-# COLUMNA IZQUIERDA: DIMENSIONES
+# PESTAÑA 1: RULETA
 # ------------------------------------------------------------------------------
 
-with col_izq:
-    dims_html = ""
-    for dim in DIMENSIONES_SESION:
-        dims_html += (
-            f'<div class="item-dimension">'
-            f'<div class="titulo-dimension">{dim["titulo"]}</div>'
-            f'<div class="detalle-dimension">{dim["detalle"]}</div>'
-            f"</div>"
-        )
+with tab_ruleta:
+    col_izq, col_centro, col_der = st.columns([1.25, 3.0, 1.35], gap="large")
 
-    st.markdown(
-        f'<div class="panel-dimensiones">'
-        f'<div class="titulo-historial">🧭 4 DIMENSIONES</div>'
-        f"{dims_html}"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-
-
-# ------------------------------------------------------------------------------
-# COLUMNA CENTRAL: RULETA
-# ------------------------------------------------------------------------------
-
-with col_centro:
-    st.markdown(
-        '<div class="titulo-scamper">SCAMPER</div>',
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f'<div class="subtitulo-estado">{st.session_state.estado_texto}</div>',
-        unsafe_allow_html=True,
-    )
-
-    opciones_activas = [
-        o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
-    ]
-
-    placeholder_ruleta = st.empty()
-    placeholder_ruleta.markdown(
-        generar_svg_ruleta(opciones_activas, st.session_state.angulo_actual),
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        generar_barra_vidas(st.session_state.opciones),
-        unsafe_allow_html=True,
-    )
-
-    b1, b2 = st.columns(2, gap="medium")
-
-    with b1:
-        girar = st.button(
-            "🎯 GIRAR RULETA",
-            type="primary",
-            use_container_width=True,
-            disabled=(len(opciones_activas) == 0),
-        )
-
-    with b2:
-        reiniciar = st.button(
-            "🔄 Reiniciar",
-            type="secondary",
-            use_container_width=True,
-        )
-
-    if reiniciar:
-        st.session_state.opciones = [
-            {**item, "salidas_actuales": 0} for item in DATOS_SCAMPER
-        ]
-        st.session_state.historial = []
-        st.session_state.angulo_actual = 0
-        st.session_state.estado_texto = "Opciones activas: 7 (máx. 3 salidas c/u)"
-        st.session_state.mostrar_dialogo = False
-        st.session_state.cronometro_activo = False
-        st.session_state.sonar_campana = False
-        st.session_state.ganador_actual = None
-        st.session_state.pregunta_actual = ""
-        st.session_state.tiempo_restante = 90
-        st.rerun()
-
-    if girar and len(opciones_activas) > 0:
-        indice_ganador = random.randrange(len(opciones_activas))
-        paso = 360.0 / len(opciones_activas)
-
-        target_angle = (360.0 - (indice_ganador * paso + paso / 2.0)) % 360.0
-        angulo_inicio = float(st.session_state.angulo_actual)
-        recorrido = (target_angle - angulo_inicio) % 360.0
-        recorrido += 360.0 * random.randint(5, 7)
-
-        pasos_animacion = 85
-
-        for paso_animacion in range(pasos_animacion):
-            progreso = (paso_animacion + 1) / pasos_animacion
-            suavizado = 1 - (1 - progreso) ** 3
-            angulo = (angulo_inicio + recorrido * suavizado) % 360.0
-            st.session_state.angulo_actual = angulo
-
-            placeholder_ruleta.markdown(
-                generar_svg_ruleta(opciones_activas, angulo),
-                unsafe_allow_html=True,
+    # COLUMNA IZQUIERDA: DIMENSIONES
+    with col_izq:
+        dims_html = ""
+        for dim in DIMENSIONES_SESION:
+            dims_html += (
+                f'<div class="item-dimension">'
+                f'<div class="titulo-dimension">{dim["titulo"]}</div>'
+                f'<div class="detalle-dimension">{dim["detalle"]}</div>'
+                f"</div>"
             )
-            time.sleep(0.015)
 
-        st.session_state.angulo_actual = target_angle
+        st.markdown(
+            f'<div class="panel-dimensiones">'
+            f'<div class="titulo-historial">🧭 4 DIMENSIONES</div>'
+            f"{dims_html}"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
 
-        ganador = opciones_activas[indice_ganador]
-        ganador["salidas_actuales"] += 1
+    # COLUMNA CENTRAL: RULETA
+    with col_centro:
+        st.markdown(
+            '<div class="titulo-scamper">SCAMPER</div>',
+            unsafe_allow_html=True,
+        )
 
-        st.session_state.ganador_actual = ganador
-        st.session_state.pregunta_actual = random.choice(ganador["preguntas"])
-        st.session_state.tiempo_restante = ganador["tiempo_inicial"]
-        st.session_state.cronometro_activo = False
-        st.session_state.sonar_campana = False
-        st.session_state.mostrar_dialogo = True
+        st.markdown(
+            f'<div class="subtitulo-estado">{st.session_state.estado_texto}</div>',
+            unsafe_allow_html=True,
+        )
 
-        activas_restantes = [
+        opciones_activas = [
             o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
         ]
 
-        st.session_state.estado_texto = (
-            f"Reto seleccionado: {ganador['nombre']} | "
-            f"Salida #{ganador['salidas_actuales']} "
-            f"de {ganador['max_salidas']} | "
-            f"Activas: {len(activas_restantes)}"
+        placeholder_ruleta = st.empty()
+        placeholder_ruleta.markdown(
+            generar_svg_ruleta(opciones_activas, st.session_state.angulo_actual),
+            unsafe_allow_html=True,
         )
 
-        st.rerun()
+        st.markdown(
+            generar_barra_vidas(st.session_state.opciones),
+            unsafe_allow_html=True,
+        )
+
+        b1, b2 = st.columns(2, gap="medium")
+
+        with b1:
+            girar = st.button(
+                "🎯 GIRAR RULETA",
+                type="primary",
+                use_container_width=True,
+                disabled=(len(opciones_activas) == 0),
+            )
+
+        with b2:
+            reiniciar = st.button(
+                "🔄 Reiniciar",
+                type="secondary",
+                use_container_width=True,
+            )
+
+        if reiniciar:
+            st.session_state.opciones = [
+                {**item, "salidas_actuales": 0} for item in DATOS_SCAMPER
+            ]
+            st.session_state.historial = []
+            st.session_state.angulo_actual = 0
+            st.session_state.estado_texto = "Opciones activas: 7 (máx. 3 salidas c/u)"
+            st.session_state.mostrar_dialogo = False
+            st.session_state.cronometro_activo = False
+            st.session_state.sonar_campana = False
+            st.session_state.ganador_actual = None
+            st.session_state.pregunta_actual = ""
+            st.session_state.tiempo_restante = 90
+            st.rerun()
+
+        if girar and len(opciones_activas) > 0:
+            indice_ganador = random.randrange(len(opciones_activas))
+            paso = 360.0 / len(opciones_activas)
+
+            target_angle = (360.0 - (indice_ganador * paso + paso / 2.0)) % 360.0
+            angulo_inicio = float(st.session_state.angulo_actual)
+            recorrido = (target_angle - angulo_inicio) % 360.0
+            recorrido += 360.0 * random.randint(5, 7)
+
+            pasos_animacion = 85
+
+            for paso_animacion in range(pasos_animacion):
+                progreso = (paso_animacion + 1) / pasos_animacion
+                suavizado = 1 - (1 - progreso) ** 3
+                angulo = (angulo_inicio + recorrido * suavizado) % 360.0
+                st.session_state.angulo_actual = angulo
+
+                placeholder_ruleta.markdown(
+                    generar_svg_ruleta(opciones_activas, angulo),
+                    unsafe_allow_html=True,
+                )
+                time.sleep(0.015)
+
+            st.session_state.angulo_actual = target_angle
+
+            ganador = opciones_activas[indice_ganador]
+            ganador["salidas_actuales"] += 1
+
+            st.session_state.ganador_actual = ganador
+            st.session_state.pregunta_actual = random.choice(ganador["preguntas"])
+            st.session_state.tiempo_restante = ganador["tiempo_inicial"]
+            st.session_state.cronometro_activo = False
+            st.session_state.sonar_campana = False
+            st.session_state.mostrar_dialogo = True
+
+            activas_restantes = [
+                o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
+            ]
+
+            st.session_state.estado_texto = (
+                f"Reto seleccionado: {ganador['nombre']} | "
+                f"Salida #{ganador['salidas_actuales']} "
+                f"de {ganador['max_salidas']} | "
+                f"Activas: {len(activas_restantes)}"
+            )
+
+            st.rerun()
+
+    # COLUMNA DERECHA: HISTORIAL Y CÓDIGO QR
+    with col_der:
+        with st.container(border=True):
+            st.markdown(
+                '<div class="titulo-historial">📋 HISTORIAL DE SALIDAS</div>',
+                unsafe_allow_html=True,
+            )
+            if st.session_state.historial:
+                for item in reversed(st.session_state.historial):
+                    texto_item = item["texto"] if isinstance(item, dict) else item
+                    color_item = item["color"] if isinstance(item, dict) else "#C44B56"
+                    st.markdown(
+                        f'<div class="item-historial" style="border-left: 5px solid {color_item};">'
+                        f"{texto_item}</div>",
+                        unsafe_allow_html=True,
+                    )
+            else:
+                st.caption("Aún no hay salidas registradas.")
+
+        with st.container(border=True):
+            st.markdown(
+                '<div class="titulo-historial" style="margin-bottom:8px;">📱 CÓDIGO QR</div>',
+                unsafe_allow_html=True,
+            )
+            st.image(
+                crear_imagen_qr(st.session_state.url_qr),
+                caption="Escanea para participar",
+                use_container_width=True,
+            )
 
 
 # ------------------------------------------------------------------------------
-# COLUMNA DERECHA: HISTORIAL Y CÓDIGO QR
+# PESTAÑA 2: NUBECITA DE IDEAS (PROYECCIÓN EN SESIÓN)
 # ------------------------------------------------------------------------------
 
-with col_der:
-    if st.session_state.historial:
-        items_html = "".join(
-            f'<div class="item-historial">{item}</div>'
-            for item in reversed(st.session_state.historial)
+with tab_nube:
+    c_tit, c_btn = st.columns([4, 1])
+    with c_tit:
+        st.subheader("☁️ Nubecita de ideas de la sesión")
+        st.caption(
+            "Las ideas idénticas se agrupan automáticamente y crecen según cuántas veces se repiten."
         )
+    with c_btn:
+        st.button("🔄 Actualizar ideas", use_container_width=True)
+
+    ideas_lista, error_lectura = leer_ideas_sheet()
+
+    if error_lectura:
+        st.info(
+            "Para ver la nube aquí, asegúrate de que el Google Sheet esté compartido como "
+            "'Cualquier persona con el enlace puede leer' (o usa el botón 'Ver nubecita de ideas' dentro de la app del QR)."
+        )
+    elif not ideas_lista:
+        st.info("Aún no hay ideas registradas en la hoja 'Respuestas'.")
     else:
-        items_html = (
-            '<div style="text-align:center;color:#6c757d;'
-            'font-size:12px;margin-top:55px;">'
-            "Aún no hay salidas registradas</div>"
+        burbujas = []
+        for item in ideas_lista:
+            tamano = min(28, 15 + (item["cantidad"] - 1) * 3)
+            borde = COLORES_LETRA.get(item["letra"], "#C44B56")
+            conteo = f" <strong>(×{item['cantidad']})</strong>" if item["cantidad"] > 1 else ""
+            etiqueta = f"<span style='color:{borde}; font-weight:800;'>[{item['letra']}]</span> " if item["letra"] else ""
+            burbujas.append(
+                f'<div class="burbuja-nube" style="font-size:{tamano}px; border-color:{borde};">'
+                f"{etiqueta}{item['idea']}{conteo}</div>"
+            )
+
+        st.markdown(
+            f'<div class="nube-contenedor">{"".join(burbujas)}</div>',
+            unsafe_allow_html=True,
         )
-
-    st.markdown(
-        f'<div class="panel-historial">'
-        f'<div class="titulo-historial">📋 HISTORIAL</div>'
-        f"{items_html}"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        '<div class="panel-qr">'
-        '<div class="titulo-historial" style="margin-bottom:8px;">📱 CÓDIGO QR</div>',
-        unsafe_allow_html=True,
-    )
-
-    st.image(
-        crear_imagen_qr(st.session_state.url_qr),
-        caption="Escanea para participar",
-        use_container_width=True,
-    )
-
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ==============================================================================
