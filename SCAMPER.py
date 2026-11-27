@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Ruleta SCAMPER - Comunicación de Equipo
@@ -15,6 +16,7 @@ import qrcode
 from PIL import Image
 import streamlit as st
 import streamlit.components.v1 as components
+
 
 # ==============================================================================
 # CONFIGURACIÓN DE ENLACES (APPS SCRIPT QR Y GOOGLE SHEETS)
@@ -220,13 +222,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué reunión o conversación podríamos reemplazar por un mensaje breve sin perder información importante?",
-            "¿Qué canal podríamos cambiar para que los avisos lleguen más fácilmente a quienes los necesitan?",
-            "¿De qué otra manera podríamos pedir apoyo cuando necesitamos ayuda de un compañero?",
-            "¿Qué forma de compartir novedades podríamos sustituir por una opción más práctica para todos?",
-            "¿Qué palabras podríamos usar en lugar de expresiones que a veces generan confusión?",
-            "¿Cómo podríamos reemplazar los mensajes largos por una forma más sencilla de comunicar lo esencial?",
-            "¿Qué hábito de comunicación podríamos cambiar para estar más conectados como equipo?",
+            "¿Qué forma de comunicarnos podríamos cambiar por una más cercana y sencilla?",
+            "¿Qué mensaje podríamos compartir de otra manera para evitar reuniones innecesarias?",
+            "¿Qué hábito de comunicación deberíamos dejar atrás para entendernos mejor?",
+            "¿Qué canal sería más práctico para compartir las novedades del equipo?",
+            "¿Cómo podríamos hacer que pedir ayuda o solicitar algo sea más fácil y directo?",
+            "¿Qué forma de dar seguimiento podríamos reemplazar por una que nos ahorre tiempo?",
+            "¿Qué palabras o expresiones podríamos utilizar para evitar malentendidos?"
         ],
     },
     {
@@ -236,13 +238,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué reuniones o espacios que ya tenemos podríamos unir para compartir información y resolver temas a la vez?",
-            "¿Cómo podríamos combinar las fortalezas de distintas personas para comunicarnos y coordinarnos mejor?",
-            "¿Qué canales podríamos integrar para que la información esté más ordenada y sea fácil de encontrar?",
-            "¿Qué momento de la jornada podríamos aprovechar para compartir avances y escuchar cómo estamos?",
-            "¿Qué dinámicas breves podríamos unir para conocernos y trabajar mejor juntos?",
-            "¿Cómo podríamos combinar la información de distintas áreas para tener una visión más completa?",
-            "¿Qué ideas de varias personas podríamos reunir para encontrar una mejor forma de comunicarnos?",
+            "¿Qué momentos de nuestra jornada podríamos aprovechar para conversar más como equipo?",
+            "¿Cómo podríamos unir espacios de trabajo para compartir conocimientos y experiencias?",
+            "¿Qué temas podríamos mezclar en nuestras conversaciones para conocernos más allá del trabajo?",
+            "¿Qué ideas de diferentes compañeros podríamos unir para encontrar mejores soluciones?",
+            "¿Qué dinámicas podríamos combinar para que nuestras reuniones sean más participativas?",
+            "¿Cómo podríamos conectar los diferentes canales de comunicación para mantenernos mejor informados?",
+            "¿Qué intereses en común podríamos aprovechar para generar conversaciones entre compañeros?"
         ],
     },
     {
@@ -252,13 +254,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Cómo podríamos adaptar la manera de explicar un tema según quién necesita recibir la información?",
-            "¿Qué práctica de comunicación de otro equipo podríamos adaptar a nuestra forma de trabajar?",
-            "¿Cómo podríamos ajustar nuestros mensajes cuando hay poco tiempo y necesitamos ser claros?",
-            "¿Qué podemos adaptar para que las personas nuevas se sientan incluidas y sepan dónde encontrar información?",
-            "¿Cómo podríamos adaptar la forma de dar retroalimentación para que sea más fácil conversar y mejorar?",
-            "¿Qué cambio haría más sencillo compartir dudas o pedir ayuda entre compañeros?",
-            "¿Cómo podríamos adaptar nuestras conversaciones para escuchar mejor distintas opiniones?",
+            "¿Cómo podríamos explicar nuestras ideas de una manera que todos podamos entender?",
+            "¿Qué podríamos aprender de otros equipos para mejorar nuestra comunicación?",
+            "¿Cómo podemos adaptar nuestra comunicación cuando tenemos días más cargados de trabajo?",
+            "¿Qué información deberíamos compartir desde el inicio para evitar confusiones?",
+            "¿Cómo podríamos adaptar nuestros mensajes según la persona o el equipo al que nos dirigimos?",
+            "¿Qué buena práctica de comunicación podríamos incorporar a nuestra rutina?",
+            "¿Cómo podríamos crear un ambiente donde todos se sientan cómodos compartiendo sus ideas?"
         ],
     },
     {
@@ -268,13 +270,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué podríamos cambiar en nuestras reuniones para que todos tengan oportunidad de participar?",
-            "¿Cómo podríamos hacer que los mensajes importantes sean más claros y fáciles de identificar?",
-            "¿Qué podríamos ajustar en la forma de dar seguimiento a los acuerdos para que no se pierdan?",
-            "¿Cómo podríamos mejorar la manera de expresar desacuerdos sin que la conversación se vuelva incómoda?",
-            "¿Qué pequeño cambio ayudaría a que nuestras conversaciones sean más dinámicas y participativas?",
-            "¿Cómo podríamos presentar los avances para que se entiendan de un vistazo?",
-            "¿Qué podríamos modificar en nuestra forma de escuchar para comprender mejor antes de responder?",
+            "¿Qué cambiaríamos en nuestras reuniones para que todos tengan más oportunidad de participar?",
+            "¿Cómo podríamos mejorar la manera en que compartimos nuestras dudas o inquietudes?",
+            "¿Qué podríamos ajustar al momento de ponernos de acuerdo para evitar confusiones?",
+            "¿Cómo podríamos cerrar nuestras conversaciones para asegurarnos de que todos entendimos lo mismo?",
+            "¿Qué haría que nuestras conversaciones fueran más abiertas y participativas?",
+            "¿Cómo podríamos hacer que compartir avances sea más sencillo y visual?",
+            "¿Qué pequeño cambio ayudaría a que nuestras conversaciones sean más ágiles y productivas?"
         ],
     },
     {
@@ -284,13 +286,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Cómo podríamos aprovechar una reunión que ya existe para compartir también aprendizajes o buenas noticias?",
-            "¿De qué otra manera podríamos usar los espacios informales para acercarnos y conocer cómo estamos?",
-            "¿Cómo podríamos aprovechar los conocimientos de cada persona para resolver dudas de todo el equipo?",
-            "¿Qué uso nuevo podríamos dar a un chat o canal que ya tenemos para facilitar la colaboración?",
-            "¿Cómo podríamos aprovechar las pausas para intercambiar ideas sin sumar más reuniones?",
-            "¿De qué otra forma podríamos usar las notas de reunión para mantener a todos al tanto de los acuerdos?",
-            "¿Cómo podríamos convertir los momentos de trabajo compartido en oportunidades para aprender unos de otros?",
+            "¿Cómo podríamos aprovechar las reuniones que ya tenemos para fortalecer la relación entre compañeros?",
+            "¿Qué otros usos podríamos darles a los espacios que compartimos durante la jornada?",
+            "¿Cómo podríamos aprovechar las habilidades de cada compañero para aprender unos de otros?",
+            "¿Qué actividad diferente podríamos realizar en nuestros espacios habituales de conversación?",
+            "¿Cómo podríamos utilizar los momentos libres para compartir experiencias o inquietudes?",
+            "¿De qué otra manera podríamos aprovechar las notas y acuerdos para mantenernos conectados?",
+            "¿Cómo podríamos convertir las conversaciones cotidianas en oportunidades para compartir nuevas ideas?"
         ],
     },
     {
@@ -300,13 +302,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué mensajes repetidos podríamos evitar para que la información llegue de forma más sencilla?",
-            "¿Qué interrupciones podríamos reducir para escuchar y conversar con más atención?",
-            "¿Qué pasos innecesarios hacen más difícil compartir una información sencilla?",
-            "¿Qué costumbre de comunicación podríamos dejar atrás porque ya no nos ayuda como equipo?",
-            "¿Qué información podríamos dejar de incluir en los mensajes para ir directo a lo importante?",
-            "¿Qué barreras hacen que a veces nos cueste expresar una duda o pedir ayuda?",
-            "¿Qué conversaciones o coordinaciones podríamos simplificar para aprovechar mejor el tiempo?",
+            "¿Qué paso podríamos eliminar para que compartir información sea más sencillo?",
+            "¿Qué distracciones deberíamos evitar cuando estamos conversando?",
+            "¿Qué proceso innecesario nos hace perder tiempo al comunicarnos?",
+            "¿Qué costumbre de comunicación ya no nos aporta y deberíamos dejar atrás?",
+            "¿Qué información repetitiva podríamos eliminar de nuestros mensajes?",
+            "¿Qué barreras nos impiden expresar nuestras opiniones con confianza?",
+            "¿Qué situaciones hacen que nuestras conversaciones se alarguen sin llegar a acuerdos?"
         ],
     },
     {
@@ -316,13 +318,13 @@ DATOS_SCAMPER = [
         "tiempo_inicial": 90,
         "max_salidas": 3,
         "preguntas": [
-            "¿Qué información deberíamos compartir primero para que todos comprendamos mejor un tema?",
-            "¿Cómo podríamos organizar los mensajes para distinguir rápidamente lo urgente de lo informativo?",
-            "¿En qué momento sería más útil compartir avances para que todos puedan tomar acción a tiempo?",
-            "¿Cómo podríamos distribuir los turnos de palabra para que todas las voces sean escuchadas?",
-            "¿Qué deberíamos conversar antes de asignar tareas para evitar confusiones después?",
-            "¿Cómo podríamos ordenar los acuerdos y responsabilidades para que cada persona sepa qué sigue?",
-            "¿Qué espacio o momento podríamos reorganizar para facilitar conversaciones entre áreas?",
+            "¿Qué deberíamos conversar primero para que nuestros intercambios sean más claros?",
+            "¿Cómo podríamos organizar la información para que todos encontremos lo que necesitamos?",
+            "¿En qué momento de la jornada sería mejor compartir las novedades del equipo?",
+            "¿Cómo podríamos distribuir los espacios de participación para escuchar diferentes opiniones?",
+            "¿Qué información deberíamos conocer antes de iniciar una conversación importante?",
+            "¿Cómo podríamos ordenar nuestras ideas antes de tomar una decisión en equipo?",
+            "¿Qué conversaciones podríamos trasladar a otro momento para que todos puedan participar mejor?"
         ],
     },
 ]
@@ -335,6 +337,7 @@ COLORES_LETRA = {item["letra"]: item["color"] for item in DATOS_SCAMPER}
 # ==============================================================================
 
 def inicializar_estado():
+
     if "opciones" not in st.session_state:
         st.session_state.opciones = [
             {**item, "salidas_actuales": 0} for item in DATOS_SCAMPER
@@ -373,33 +376,95 @@ def inicializar_estado():
     if "refresco_nube" not in st.session_state:
         st.session_state.refresco_nube = 0
 
+    # --------------------------------------------------------------------------
+    # ACTUALIZAR PREGUNTAS SIN PERDER LAS SALIDAS REGISTRADAS
+    # --------------------------------------------------------------------------
+
+    VERSION_PREGUNTAS = 3
+
+    if st.session_state.get("version_preguntas") != VERSION_PREGUNTAS:
+
+        opciones_anteriores = {
+            opcion["letra"]: opcion
+            for opcion in st.session_state.opciones
+        }
+
+        opciones_actualizadas = []
+
+        for item in DATOS_SCAMPER:
+            anterior = opciones_anteriores.get(item["letra"], {})
+
+            opcion_actualizada = {
+                **item,
+                "salidas_actuales": anterior.get("salidas_actuales", 0)
+            }
+
+            opciones_actualizadas.append(opcion_actualizada)
+
+        st.session_state.opciones = opciones_actualizadas
+
+        # Actualizar también el reto si había uno abierto
+        if st.session_state.ganador_actual:
+
+            letra_ganadora = st.session_state.ganador_actual["letra"]
+
+            nuevo_ganador = next(
+                (
+                    opcion for opcion in st.session_state.opciones
+                    if opcion["letra"] == letra_ganadora
+                ),
+                None
+            )
+
+            st.session_state.ganador_actual = nuevo_ganador
+
+            if nuevo_ganador:
+                if st.session_state.pregunta_actual not in nuevo_ganador["preguntas"]:
+                    st.session_state.pregunta_actual = random.choice(
+                        nuevo_ganador["preguntas"]
+                    )
+
+        st.session_state.version_preguntas = VERSION_PREGUNTAS
+
 
 @st.cache_data
 def crear_imagen_qr(url: str) -> bytes:
+
     qr = qrcode.QRCode(
         version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_M,
         box_size=7,
         border=2,
     )
+
     qr.add_data(url)
     qr.make(fit=True)
-    img: Image.Image = qr.make_image(fill_color="#212529", back_color="white").convert("RGB")
+
+    img: Image.Image = qr.make_image(
+        fill_color="#212529",
+        back_color="white"
+    ).convert("RGB")
+
     buffer = io.BytesIO()
     img.save(buffer, format="PNG")
+
     return buffer.getvalue()
 
 
 def leer_ideas_sheet(nonce: int = 0):
+
     url_csv = (
         f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq"
         f"?tqx=out:csv&sheet={urllib.parse.quote(SHEET_NAME)}&cachebust={nonce}"
     )
+
     try:
+
         req = urllib.request.Request(
             url_csv,
             headers={"User-Agent": "Mozilla/5.0"},
         )
+
         with urllib.request.urlopen(req, timeout=10) as resp:
             contenido = resp.read().decode("utf-8", errors="replace")
 
@@ -408,29 +473,41 @@ def leer_ideas_sheet(nonce: int = 0):
 
         lector = csv.reader(io.StringIO(contenido))
         filas = list(lector)
+
         if len(filas) <= 1:
             return [], None
 
         agrupadas = {}
+
         for fila in filas[1:]:
+
             letra = fila[1].strip() if len(fila) > 1 else ""
             idea = fila[3].strip() if len(fila) > 3 else ""
+
             if not idea:
                 continue
+
             clave = idea.lower()
+
             if clave not in agrupadas:
+
                 agrupadas[clave] = {
                     "idea": idea,
                     "letra": letra[:1].upper() if letra else "",
                     "cantidad": 1,
                 }
+
             else:
                 agrupadas[clave]["cantidad"] += 1
 
         lista = sorted(
-            agrupadas.values(), key=lambda x: x["cantidad"], reverse=True
+            agrupadas.values(),
+            key=lambda x: x["cantidad"],
+            reverse=True
         )
+
         return lista, None
+
     except Exception as e:
         return [], str(e)
 
@@ -443,6 +520,7 @@ inicializar_estado()
 # ==============================================================================
 
 def reproducir_campana():
+
     components.html(
         """
         <script>
@@ -489,6 +567,7 @@ def reproducir_campana():
 # ==============================================================================
 
 def generar_svg_ruleta(opciones, angulo_actual):
+
     size = 350
     cx = size / 2
     cy = size / 2
@@ -496,6 +575,7 @@ def generar_svg_ruleta(opciones, angulo_actual):
     num = len(opciones)
 
     if num == 0:
+
         return (
             f'<div style="display:flex;justify-content:center;'
             f'align-items:center;margin:4px 0;">'
@@ -514,6 +594,7 @@ def generar_svg_ruleta(opciones, angulo_actual):
     partes = []
 
     for i, opt in enumerate(opciones):
+
         start_deg = (angulo_actual + i * paso) % 360
         end_deg = start_deg + paso
 
@@ -529,17 +610,21 @@ def generar_svg_ruleta(opciones, angulo_actual):
         large_arc = 1 if paso > 180 else 0
 
         if num == 1:
+
             partes.append(
                 f'<circle cx="{cx}" cy="{cy}" r="{r}" '
                 f'fill="{opt["color"]}" stroke="white" '
                 f'stroke-width="3"/>'
             )
+
         else:
+
             d = (
                 f"M {cx},{cy} L {x1:.2f},{y1:.2f} "
                 f"A {r},{r} 0 {large_arc},1 "
                 f"{x2:.2f},{y2:.2f} Z"
             )
+
             partes.append(
                 f'<path d="{d}" fill="{opt["color"]}" '
                 f'stroke="white" stroke-width="3"/>'
@@ -553,8 +638,11 @@ def generar_svg_ruleta(opciones, angulo_actual):
         ty = cy + (r * 0.56) * math.sin(mid_rad)
 
         font_size = 9 if len(opt["nombre"]) > 14 else 10.5
+
         color_texto = (
-            "#212529" if opt["color"] in ["#F5D687", "#B3CFC3"] else "#ffffff"
+            "#212529"
+            if opt["color"] in ["#F5D687", "#B3CFC3"]
+            else "#ffffff"
         )
 
         partes.append(
@@ -590,11 +678,18 @@ def generar_svg_ruleta(opciones, angulo_actual):
 # ==============================================================================
 
 def generar_barra_vidas(todas_opciones):
+
     chips = []
 
     for opt in todas_opciones:
+
         restantes = opt["max_salidas"] - opt["salidas_actuales"]
-        puntos = ("● " * restantes + "○ " * opt["salidas_actuales"]).strip()
+
+        puntos = (
+            "● " * restantes
+            + "○ " * opt["salidas_actuales"]
+        ).strip()
+
         opacidad = "1" if restantes > 0 else "0.45"
         color_letra = opt["color"] if restantes > 0 else "#6c757d"
 
@@ -617,11 +712,14 @@ def generar_barra_vidas(todas_opciones):
 
 @st.dialog("Reto SCAMPER", width="small")
 def dialogo_reto():
+
     ganador = st.session_state.ganador_actual
+
     if not ganador:
         return
 
     if st.session_state.sonar_campana:
+
         reproducir_campana()
         st.session_state.sonar_campana = False
 
@@ -655,19 +753,33 @@ def dialogo_reto():
     )
 
     if st.button("🔄 Cambiar pregunta", use_container_width=True):
+
         otras = [
-            p for p in ganador["preguntas"] if p != st.session_state.pregunta_actual
+            p for p in ganador["preguntas"]
+            if p != st.session_state.pregunta_actual
         ]
+
         st.session_state.pregunta_actual = (
-            random.choice(otras) if otras else random.choice(ganador["preguntas"])
+            random.choice(otras)
+            if otras
+            else random.choice(ganador["preguntas"])
         )
+
         st.rerun()
 
     mins = st.session_state.tiempo_restante // 60
     segs = st.session_state.tiempo_restante % 60
-    color_reloj = "#dc3545" if st.session_state.tiempo_restante == 0 else "#C44B56"
+
+    color_reloj = (
+        "#dc3545"
+        if st.session_state.tiempo_restante == 0
+        else "#C44B56"
+    )
+
     texto_reloj = (
-        "¡TIEMPO!" if st.session_state.tiempo_restante == 0 else f"{mins:02d}:{segs:02d}"
+        "¡TIEMPO!"
+        if st.session_state.tiempo_restante == 0
+        else f"{mins:02d}:{segs:02d}"
     )
 
     st.markdown(
@@ -683,30 +795,44 @@ def dialogo_reto():
     c1, c2 = st.columns(2)
 
     with c1:
+
         if st.button(
             "▶ Iniciar",
             use_container_width=True,
             disabled=(st.session_state.tiempo_restante == 0),
         ):
+
             st.session_state.cronometro_activo = True
             st.rerun()
 
     with c2:
+
         if st.button(
             "⏸ Pausar",
             use_container_width=True,
             disabled=(st.session_state.tiempo_restante == 0),
         ):
+
             st.session_state.cronometro_activo = False
             st.rerun()
 
-    if st.button("⏹ Terminar", type="primary", use_container_width=True):
+    if st.button(
+        "⏹ Terminar",
+        type="primary",
+        use_container_width=True
+    ):
+
         st.session_state.cronometro_activo = False
         st.session_state.sonar_campana = False
 
-        transcurrido = ganador["tiempo_inicial"] - st.session_state.tiempo_restante
+        transcurrido = (
+            ganador["tiempo_inicial"]
+            - st.session_state.tiempo_restante
+        )
+
         m_t = transcurrido // 60
         s_t = transcurrido % 60
+
         duracion = f"{m_t:02d}:{s_t:02d}"
 
         st.session_state.historial.append(
@@ -720,14 +846,18 @@ def dialogo_reto():
         )
 
         activas = [
-            o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
+            o for o in st.session_state.opciones
+            if o["salidas_actuales"] < o["max_salidas"]
         ]
 
         if len(activas) == 0:
+
             st.session_state.estado_texto = (
                 "¡Todas las categorías completaron sus 3 salidas!"
             )
+
         else:
+
             st.session_state.estado_texto = (
                 f"Última: {ganador['nombre']} "
                 f"(#{ganador['salidas_actuales']}/3) "
@@ -737,11 +867,17 @@ def dialogo_reto():
         st.session_state.mostrar_dialogo = False
         st.rerun()
 
-    if st.session_state.cronometro_activo and st.session_state.tiempo_restante > 0:
+    if (
+        st.session_state.cronometro_activo
+        and st.session_state.tiempo_restante > 0
+    ):
+
         time.sleep(1)
+
         st.session_state.tiempo_restante -= 1
 
         if st.session_state.tiempo_restante == 0:
+
             st.session_state.cronometro_activo = False
             st.session_state.sonar_campana = True
 
@@ -752,7 +888,9 @@ def dialogo_reto():
 # 9. PESTAÑAS PRINCIPALES (RULETA Y NUBE DE IDEAS)
 # ==============================================================================
 
-tab_ruleta, tab_nube = st.tabs(["🎯 Ruleta SCAMPER", "☁️ Nubecita de ideas"])
+tab_ruleta, tab_nube = st.tabs(
+    ["🎯 Ruleta SCAMPER", "☁️ Nubecita de ideas"]
+)
 
 
 # ------------------------------------------------------------------------------
@@ -760,11 +898,18 @@ tab_ruleta, tab_nube = st.tabs(["🎯 Ruleta SCAMPER", "☁️ Nubecita de ideas
 # ------------------------------------------------------------------------------
 
 with tab_ruleta:
-    col_izq, col_centro, col_der = st.columns([1.25, 3.0, 1.35], gap="large")
+
+    col_izq, col_centro, col_der = st.columns(
+        [1.25, 3.0, 1.35],
+        gap="large"
+    )
 
     with col_izq:
+
         dims_html = ""
+
         for dim in DIMENSIONES_SESION:
+
             dims_html += (
                 f'<div class="item-dimension">'
                 f'<div class="titulo-dimension">{dim["titulo"]}</div>'
@@ -781,23 +926,30 @@ with tab_ruleta:
         )
 
     with col_centro:
+
         st.markdown(
             '<div class="titulo-scamper">SCAMPER</div>',
             unsafe_allow_html=True,
         )
 
         st.markdown(
-            f'<div class="subtitulo-estado">{st.session_state.estado_texto}</div>',
+            f'<div class="subtitulo-estado">'
+            f'{st.session_state.estado_texto}</div>',
             unsafe_allow_html=True,
         )
 
         opciones_activas = [
-            o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
+            o for o in st.session_state.opciones
+            if o["salidas_actuales"] < o["max_salidas"]
         ]
 
         placeholder_ruleta = st.empty()
+
         placeholder_ruleta.markdown(
-            generar_svg_ruleta(opciones_activas, st.session_state.angulo_actual),
+            generar_svg_ruleta(
+                opciones_activas,
+                st.session_state.angulo_actual
+            ),
             unsafe_allow_html=True,
         )
 
@@ -809,6 +961,7 @@ with tab_ruleta:
         b1, b2 = st.columns(2, gap="medium")
 
         with b1:
+
             girar = st.button(
                 "🎯 GIRAR RULETA",
                 type="primary",
@@ -817,6 +970,7 @@ with tab_ruleta:
             )
 
         with b2:
+
             reiniciar = st.button(
                 "🔄 Reiniciar",
                 type="secondary",
@@ -824,57 +978,100 @@ with tab_ruleta:
             )
 
         if reiniciar:
+
             st.session_state.opciones = [
-                {**item, "salidas_actuales": 0} for item in DATOS_SCAMPER
+                {**item, "salidas_actuales": 0}
+                for item in DATOS_SCAMPER
             ]
+
             st.session_state.historial = []
             st.session_state.angulo_actual = 0
-            st.session_state.estado_texto = "Opciones activas: 7 (máx. 3 salidas c/u)"
+
+            st.session_state.estado_texto = (
+                "Opciones activas: 7 (máx. 3 salidas c/u)"
+            )
+
             st.session_state.mostrar_dialogo = False
             st.session_state.cronometro_activo = False
             st.session_state.sonar_campana = False
             st.session_state.ganador_actual = None
             st.session_state.pregunta_actual = ""
             st.session_state.tiempo_restante = 90
+
             st.rerun()
 
         if girar and len(opciones_activas) > 0:
-            indice_ganador = random.randrange(len(opciones_activas))
+
+            indice_ganador = random.randrange(
+                len(opciones_activas)
+            )
+
             paso = 360.0 / len(opciones_activas)
 
-            target_angle = (360.0 - (indice_ganador * paso + paso / 2.0)) % 360.0
-            angulo_inicio = float(st.session_state.angulo_actual)
-            recorrido = (target_angle - angulo_inicio) % 360.0
+            target_angle = (
+                360.0
+                - (indice_ganador * paso + paso / 2.0)
+            ) % 360.0
+
+            angulo_inicio = float(
+                st.session_state.angulo_actual
+            )
+
+            recorrido = (
+                target_angle - angulo_inicio
+            ) % 360.0
+
             recorrido += 360.0 * random.randint(5, 7)
 
             pasos_animacion = 85
 
             for paso_animacion in range(pasos_animacion):
-                progreso = (paso_animacion + 1) / pasos_animacion
+
+                progreso = (
+                    paso_animacion + 1
+                ) / pasos_animacion
+
                 suavizado = 1 - (1 - progreso) ** 3
-                angulo = (angulo_inicio + recorrido * suavizado) % 360.0
+
+                angulo = (
+                    angulo_inicio + recorrido * suavizado
+                ) % 360.0
+
                 st.session_state.angulo_actual = angulo
 
                 placeholder_ruleta.markdown(
-                    generar_svg_ruleta(opciones_activas, angulo),
+                    generar_svg_ruleta(
+                        opciones_activas,
+                        angulo
+                    ),
                     unsafe_allow_html=True,
                 )
+
                 time.sleep(0.015)
 
             st.session_state.angulo_actual = target_angle
 
             ganador = opciones_activas[indice_ganador]
+
             ganador["salidas_actuales"] += 1
 
             st.session_state.ganador_actual = ganador
-            st.session_state.pregunta_actual = random.choice(ganador["preguntas"])
-            st.session_state.tiempo_restante = ganador["tiempo_inicial"]
+
+            st.session_state.pregunta_actual = random.choice(
+                ganador["preguntas"]
+            )
+
+            st.session_state.tiempo_restante = (
+                ganador["tiempo_inicial"]
+            )
+
             st.session_state.cronometro_activo = False
             st.session_state.sonar_campana = False
             st.session_state.mostrar_dialogo = True
 
             activas_restantes = [
-                o for o in st.session_state.opciones if o["salidas_actuales"] < o["max_salidas"]
+                o for o in st.session_state.opciones
+                if o["salidas_actuales"] < o["max_salidas"]
             ]
 
             st.session_state.estado_texto = (
@@ -887,30 +1084,59 @@ with tab_ruleta:
             st.rerun()
 
     with col_der:
+
         with st.container(border=True):
+
             st.markdown(
-                '<div class="titulo-historial">📋 HISTORIAL DE SALIDAS</div>',
+                '<div class="titulo-historial">'
+                '📋 HISTORIAL DE SALIDAS</div>',
                 unsafe_allow_html=True,
             )
+
             if st.session_state.historial:
-                for item in reversed(st.session_state.historial):
-                    texto_item = item["texto"] if isinstance(item, dict) else item
-                    color_item = item["color"] if isinstance(item, dict) else "#C44B56"
+
+                for item in reversed(
+                    st.session_state.historial
+                ):
+
+                    texto_item = (
+                        item["texto"]
+                        if isinstance(item, dict)
+                        else item
+                    )
+
+                    color_item = (
+                        item["color"]
+                        if isinstance(item, dict)
+                        else "#C44B56"
+                    )
+
                     st.markdown(
-                        f'<div class="item-historial" style="border-left: 5px solid {color_item};">'
+                        f'<div class="item-historial" '
+                        f'style="border-left: 5px solid {color_item};">'
                         f"{texto_item}</div>",
                         unsafe_allow_html=True,
                     )
+
             else:
-                st.caption("Aún no hay salidas registradas.")
+
+                st.caption(
+                    "Aún no hay salidas registradas."
+                )
 
         with st.container(border=True):
+
             st.markdown(
-                '<div class="titulo-historial" style="margin-bottom:6px;">📱 CÓDIGO QR</div>',
+                '<div class="titulo-historial" '
+                'style="margin-bottom:6px;">'
+                '📱 CÓDIGO QR</div>',
                 unsafe_allow_html=True,
             )
+
             st.image(
-                crear_imagen_qr(st.session_state.url_qr),
+                crear_imagen_qr(
+                    st.session_state.url_qr
+                ),
                 caption="Escanea para participar",
                 use_container_width=True,
             )
@@ -921,37 +1147,83 @@ with tab_ruleta:
 # ------------------------------------------------------------------------------
 
 with tab_nube:
+
     c_tit, c_btn = st.columns([4, 1])
+
     with c_tit:
-        st.subheader("☁️ Nubecita de ideas de la sesión")
-        st.caption(
-            "Las ideas idénticas se agrupan automáticamente y crecen según cuántas veces se repiten."
+
+        st.subheader(
+            "☁️ Nubecita de ideas de la sesión"
         )
+
+        st.caption(
+            "Las ideas idénticas se agrupan automáticamente "
+            "y crecen según cuántas veces se repiten."
+        )
+
     with c_btn:
-        if st.button("🔄 Actualizar ideas", use_container_width=True):
+
+        if st.button(
+            "🔄 Actualizar ideas",
+            use_container_width=True
+        ):
+
             st.session_state.refresco_nube += 1
             st.rerun()
 
-    ideas_lista, error_lectura = leer_ideas_sheet(st.session_state.refresco_nube)
+    ideas_lista, error_lectura = leer_ideas_sheet(
+        st.session_state.refresco_nube
+    )
 
     if error_lectura:
+
         st.warning(error_lectura)
+
     elif not ideas_lista:
-        st.info("Aún no hay ideas registradas en la hoja 'Respuestas'.")
+
+        st.info(
+            "Aún no hay ideas registradas en la hoja 'Respuestas'."
+        )
+
     else:
+
         burbujas = []
+
         for item in ideas_lista:
-            tamano = min(28, 15 + (item["cantidad"] - 1) * 3)
-            borde = COLORES_LETRA.get(item["letra"], "#C44B56")
-            conteo = f" <strong>(×{item['cantidad']})</strong>" if item["cantidad"] > 1 else ""
-            etiqueta = f"<span style='color:{borde}; font-weight:800;'>[{item['letra']}]</span> " if item["letra"] else ""
+
+            tamano = min(
+                28,
+                15 + (item["cantidad"] - 1) * 3
+            )
+
+            borde = COLORES_LETRA.get(
+                item["letra"],
+                "#C44B56"
+            )
+
+            conteo = (
+                f" <strong>(×{item['cantidad']})</strong>"
+                if item["cantidad"] > 1
+                else ""
+            )
+
+            etiqueta = (
+                f"<span style='color:{borde}; font-weight:800;'>"
+                f"[{item['letra']}]</span> "
+                if item["letra"]
+                else ""
+            )
+
             burbujas.append(
-                f'<div class="burbuja-nube" style="font-size:{tamano}px; border-color:{borde};">'
+                f'<div class="burbuja-nube" '
+                f'style="font-size:{tamano}px; '
+                f'border-color:{borde};">'
                 f"{etiqueta}{item['idea']}{conteo}</div>"
             )
 
         st.markdown(
-            f'<div class="nube-contenedor">{"".join(burbujas)}</div>',
+            f'<div class="nube-contenedor">'
+            f'{"".join(burbujas)}</div>',
             unsafe_allow_html=True,
         )
 
@@ -960,5 +1232,9 @@ with tab_nube:
 # 10. MOSTRAR VENTANA EMERGENTE
 # ==============================================================================
 
-if st.session_state.mostrar_dialogo and st.session_state.ganador_actual:
+if (
+    st.session_state.mostrar_dialogo
+    and st.session_state.ganador_actual
+):
+
     dialogo_reto()
